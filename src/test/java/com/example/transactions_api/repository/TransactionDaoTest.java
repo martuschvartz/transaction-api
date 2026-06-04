@@ -6,17 +6,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TransactionDaoTest {
     private final static double EPSILON = 0.0001;
-    TransactionDao ts;
+    TransactionDao transactionDao;
 
     @BeforeEach
     void setUp(){
-        ts = new InMemoryTransactionDao();
+        transactionDao = new InMemoryTransactionDao();
     }
 
     @Test
@@ -25,7 +26,7 @@ public class TransactionDaoTest {
         String type = "transaction type";
         double amount = 10.0;
 
-        Transaction newTransaction = ts.createTransaction(validId, type, amount);
+        Transaction newTransaction = transactionDao.createTransaction(validId, type, amount);
 
         assertNotNull(newTransaction);
         assertEquals(type, newTransaction.type());
@@ -38,9 +39,9 @@ public class TransactionDaoTest {
         long id = 1L;
         String type = "my-type";
         double amount = 0.0;
-        ts.createTransaction(id, type, amount);
+        transactionDao.createTransaction(id, type, amount);
 
-        List<Long> recoveredTransactions = ts.getTransactionsByType(type);
+        List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
         assertFalse(recoveredTransactions.isEmpty());
         assertEquals(1, recoveredTransactions.size());
@@ -48,30 +49,36 @@ public class TransactionDaoTest {
     }
 
     @Test
-    void test_GetTransactionSum_DirectConnection(){
-        // Prepare
-        double expected = 2.0;
-        long parentId = 1L;
-        ts.createTransaction(parentId, "type", 1.0);
-        ts.createTransaction(2L, "type", 1.0, parentId);
+    void test_GetTransactionByType_MultipleSameType(){
+        //Prepare
+        String type = "cars";
+        transactionDao.createTransaction(1L, type, 1.0);
+        transactionDao.createTransaction(2L, type, 2.0);
 
-        double sum = ts.getAmountSum(parentId);
+        List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
-        assertEquals(expected, sum, EPSILON);
+        assertEquals(2, recoveredTransactions.size());
+        assertTrue(recoveredTransactions.containsAll(List.of(1L, 2L)));
     }
 
     @Test
-    void test_GetTransactionSum_TransitiveConnection(){
-        // Prepare
-        double expected = 3.0;
-        long grandpaId = 1L;
-        long parentId = 2L;
-        ts.createTransaction(grandpaId, "type", 1.0);
-        ts.createTransaction(parentId, "type", 1.0, grandpaId);
-        ts.createTransaction(3L, "type", 1.0, parentId);
+    void test_GetTransactionByType_UnknownType_ReturnsEmpty(){
+        List<Long> recoveredTransactions = transactionDao.getTransactionsByType("does-not-exist");
 
-        double sum = ts.getAmountSum(grandpaId);
+        assertNotNull(recoveredTransactions);
+        assertTrue(recoveredTransactions.isEmpty());
+    }
 
-        assertEquals(expected, sum, EPSILON);
+    @Test
+    void test_GetAll_ReturnsEveryStoredTransaction(){
+        //Prepare
+        transactionDao.createTransaction(1L, "type", 1.0);
+        transactionDao.createTransaction(2L, "type", 2.0, 1L);
+
+        Map<Long, Transaction> all = transactionDao.getAll();
+
+        assertEquals(2, all.size());
+        assertEquals(1.0, all.get(1L).amount(), EPSILON);
+        assertEquals(1L, all.get(2L).parentId());
     }
 }

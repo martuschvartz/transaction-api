@@ -10,60 +10,40 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class InMemoryTransactionDao implements TransactionDao {
 
-    final Map<Long, Transaction> store;
-    final Map<String, List<Long>> transactionByType;
+    private final Map<Long, Transaction> store;
+    private final Map<String, List<Long>> transactionByType;
 
     public InMemoryTransactionDao(){
         this.store = new ConcurrentHashMap<>();
         this.transactionByType = new ConcurrentHashMap<>();
     }
 
-    @Override
-    public Transaction createTransaction(long id, String type, double amount) {
-        return createTransaction(id, type, amount, null);
-    }
-
-    @Override
-    public Transaction createTransaction(long id, String type, double amount, Long parentId) {
+    private Transaction createTransactionHelper(long id, String type, double amount, Long parentId){
         Transaction newTransaction = new Transaction(type, amount, parentId);
         store.put(id, newTransaction);
-        transactionByType.computeIfAbsent(type, newType -> {
-            List<Long> newList = new ArrayList<>();
-            newList.add(id);
-            return newList;
-        });
+        transactionByType.computeIfAbsent(type, newType -> new ArrayList<>()).add(id);
         return newTransaction;
     }
 
     @Override
-    public List<Long> getTransactionsByType(String type) {
-        return new ArrayList<>(transactionByType.getOrDefault(type, List.of()));
+    public Transaction createTransaction(long id, String type, double amount) {
+        return createTransactionHelper(id, type, amount, null);
     }
 
     @Override
-    public double getAmountSum(long id) {
-        double sum = 0.0;
-        Deque<Long> toExplore = new ArrayDeque<>();
-        Set<Long> visited = new HashSet<>();
-        toExplore.add(id);
+    public Transaction createTransaction(long id, String type, double amount, long parentId) {
+        return createTransactionHelper(id, type, amount, parentId);
+    }
 
-        while (!toExplore.isEmpty()) {
-            Long currentId = toExplore.poll();
+    @Override
+    public List<Long> getTransactionsByType(String type) {
+        if(type == null || type.isBlank())
+            return List.of();
+        return List.copyOf(transactionByType.getOrDefault(type, List.of()));
+    }
 
-            Transaction current = store.get(currentId);
-            if (current == null) continue;
-
-            if (!visited.add(currentId)) continue;
-            sum += current.amount();
-
-            // Add children to frontier
-            for (Map.Entry<Long, Transaction> entry : store.entrySet()) {
-                Long pid = entry.getValue().parentId();
-                if (pid != null && pid.equals(currentId)) {
-                    toExplore.add(entry.getKey());
-                }
-            }
-        }
-        return sum;
+    @Override
+    public Map<Long, Transaction> getAll() {
+        return Map.copyOf(store);
     }
 }
