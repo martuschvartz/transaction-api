@@ -2,10 +2,12 @@ package com.example.transactions_api.repository;
 
 import com.example.transactions_api.interfaces.TransactionDao;
 import com.example.transactions_api.models.Transaction;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class InMemoryTransactionDao implements TransactionDao {
 
     final Map<Long, Transaction> store;
@@ -39,11 +41,11 @@ public class InMemoryTransactionDao implements TransactionDao {
     }
 
     @Override
-    public double getAmountSum(long transactionId) {
+    public double getAmountSum(long id) {
         double sum = 0.0;
         Deque<Long> toExplore = new ArrayDeque<>();
         Set<Long> visited = new HashSet<>();
-        toExplore.add(transactionId);
+        toExplore.add(id);
 
         while (!toExplore.isEmpty()) {
             Long currentId = toExplore.poll();
