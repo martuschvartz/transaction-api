@@ -23,12 +23,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction createTransaction(long id, String type, double amount) {
-        return transactionDao.createTransaction(id, type, amount);
-    }
-
-    @Override
-    public Transaction createTransaction(long id, String type, double amount, long parentId) {
+    public Transaction createTransaction(long id, String type, double amount, Long parentId) {
         return transactionDao.createTransaction(id, type, amount, parentId);
     }
 

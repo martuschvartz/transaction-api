@@ -18,21 +18,12 @@ public class InMemoryTransactionDao implements TransactionDao {
         this.transactionByType = new ConcurrentHashMap<>();
     }
 
-    private Transaction createTransactionHelper(long id, String type, double amount, Long parentId){
+    @Override
+    public Transaction createTransaction(long id, String type, double amount, Long parentId) {
         Transaction newTransaction = new Transaction(type, amount, parentId);
         store.put(id, newTransaction);
         transactionByType.computeIfAbsent(type, newType -> new ArrayList<>()).add(id);
         return newTransaction;
-    }
-
-    @Override
-    public Transaction createTransaction(long id, String type, double amount) {
-        return createTransactionHelper(id, type, amount, null);
-    }
-
-    @Override
-    public Transaction createTransaction(long id, String type, double amount, long parentId) {
-        return createTransactionHelper(id, type, amount, parentId);
     }
 
     @Override

@@ -26,7 +26,7 @@ public class TransactionDaoTest {
         String type = "transaction type";
         double amount = 10.0;
 
-        Transaction newTransaction = transactionDao.createTransaction(validId, type, amount);
+        Transaction newTransaction = transactionDao.createTransaction(validId, type, amount, null);
 
         assertNotNull(newTransaction);
         assertEquals(type, newTransaction.type());
@@ -39,7 +39,7 @@ public class TransactionDaoTest {
         long id = 1L;
         String type = "my-type";
         double amount = 0.0;
-        transactionDao.createTransaction(id, type, amount);
+        transactionDao.createTransaction(id, type, amount, null);
 
         List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
@@ -52,8 +52,8 @@ public class TransactionDaoTest {
     void test_GetTransactionByType_MultipleSameType(){
         //Prepare
         String type = "cars";
-        transactionDao.createTransaction(1L, type, 1.0);
-        transactionDao.createTransaction(2L, type, 2.0);
+        transactionDao.createTransaction(1L, type, 1.0, null);
+        transactionDao.createTransaction(2L, type, 2.0, null);
 
         List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
@@ -72,7 +72,7 @@ public class TransactionDaoTest {
     @Test
     void test_GetAll_ReturnsEveryStoredTransaction(){
         //Prepare
-        transactionDao.createTransaction(1L, "type", 1.0);
+        transactionDao.createTransaction(1L, "type", 1.0, null);
         transactionDao.createTransaction(2L, "type", 2.0, 1L);
 
         Map<Long, Transaction> all = transactionDao.getAll();

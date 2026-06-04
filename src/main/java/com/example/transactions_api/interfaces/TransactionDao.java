@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface TransactionDao {
-    Transaction createTransaction(long id, String type, double amount);
-    Transaction createTransaction(long id, String type, double amount, long parentId);
+    Transaction createTransaction(long id, String type, double amount, Long parentId);
 
     List<Long> getTransactionsByType(String type);
 

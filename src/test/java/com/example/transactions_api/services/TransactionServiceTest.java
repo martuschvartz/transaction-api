@@ -22,7 +22,7 @@ public class TransactionServiceTest {
         // Prepare: direct connection
         double expected = 2.0;
         long parentId = 1L;
-        transactionService.createTransaction(parentId, "type", 1.0);
+        transactionService.createTransaction(parentId, "type", 1.0, null);
         transactionService.createTransaction(2L, "type", 1.0, parentId);
 
         double sum = transactionService.getAmountSum(parentId);
@@ -36,7 +36,7 @@ public class TransactionServiceTest {
         double expected = 3.0;
         long grandpaId = 1L;
         long parentId = 2L;
-        transactionService.createTransaction(grandpaId, "type", 1.0);
+        transactionService.createTransaction(grandpaId, "type", 1.0, null);
         transactionService.createTransaction(parentId, "type", 1.0, grandpaId);
         transactionService.createTransaction(3L, "type", 1.0, parentId);
 
@@ -49,9 +49,9 @@ public class TransactionServiceTest {
     void test_GetAmountSum_OnlyCountsDescendants(){
         // Prepare: 2 is a child of 1, but 3 is unrelated
         long rootId = 1L;
-        transactionService.createTransaction(rootId, "type", 1.0);
+        transactionService.createTransaction(rootId, "type", 1.0, null);
         transactionService.createTransaction(2L, "type", 1.0, rootId);
-        transactionService.createTransaction(3L, "type", 100.0);
+        transactionService.createTransaction(3L, "type", 100.0, null);
 
         double sum = transactionService.getAmountSum(rootId);
 
