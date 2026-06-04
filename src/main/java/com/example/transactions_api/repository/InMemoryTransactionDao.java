@@ -3,9 +3,7 @@ package com.example.transactions_api.repository;
 import com.example.transactions_api.interfaces.TransactionDao;
 import com.example.transactions_api.models.Transaction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryTransactionDao implements TransactionDao {
@@ -38,5 +36,32 @@ public class InMemoryTransactionDao implements TransactionDao {
     @Override
     public List<Long> getTransactionsByType(String type) {
         return new ArrayList<>(transactionByType.getOrDefault(type, List.of()));
+    }
+
+    @Override
+    public double getAmountSum(long transactionId) {
+        double sum = 0.0;
+        Deque<Long> toExplore = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+        toExplore.add(transactionId);
+
+        while (!toExplore.isEmpty()) {
+            Long currentId = toExplore.poll();
+
+            Transaction current = store.get(currentId);
+            if (current == null) continue;
+
+            if (!visited.add(currentId)) continue;
+            sum += current.amount();
+
+            // Add children to frontier
+            for (Map.Entry<Long, Transaction> entry : store.entrySet()) {
+                Long pid = entry.getValue().parentId();
+                if (pid != null && pid.equals(currentId)) {
+                    toExplore.add(entry.getKey());
+                }
+            }
+        }
+        return sum;
     }
 }

@@ -47,4 +47,31 @@ public class TransactionDaoTest {
         assertEquals(id, recoveredTransactions.getFirst());
     }
 
+    @Test
+    void test_GetTransactionSum_DirectConnection(){
+        // Prepare
+        double expected = 2.0;
+        long parentId = 1L;
+        ts.createTransaction(parentId, "type", 1.0);
+        ts.createTransaction(2L, "type", 1.0, parentId);
+
+        double sum = ts.getAmountSum(parentId);
+
+        assertEquals(expected, sum, EPSILON);
+    }
+
+    @Test
+    void test_GetTransactionSum_TransitiveConnection(){
+        // Prepare
+        double expected = 3.0;
+        long grandpaId = 1L;
+        long parentId = 2L;
+        ts.createTransaction(grandpaId, "type", 1.0);
+        ts.createTransaction(parentId, "type", 1.0, grandpaId);
+        ts.createTransaction(3L, "type", 1.0, parentId);
+
+        double sum = ts.getAmountSum(grandpaId);
+
+        assertEquals(expected, sum, EPSILON);
+    }
 }

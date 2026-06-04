@@ -9,4 +9,6 @@ public interface TransactionDao {
     Transaction createTransaction(long validId, String type, double amount, Long parentId);
 
     List<Long> getTransactionsByType(String type);
+
+    double getAmountSum(long transactionId);
 }
