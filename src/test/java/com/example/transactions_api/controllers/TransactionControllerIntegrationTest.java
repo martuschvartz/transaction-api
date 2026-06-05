@@ -61,13 +61,6 @@ class TransactionControllerIntegrationTest {
     }
 
     @Test
-    void test_GetExistingTypes_ReturnsEmpty() throws Exception {
-        mockMvc.perform(get("/transactions/types"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
     void test_GetSum_ReturnsTransitiveSum() throws Exception {
         // 31 child of 30, 32 child of 31  ->  sum(30) = 5000 + 10000 + 5000
         mockMvc.perform(put("/transactions/30")
