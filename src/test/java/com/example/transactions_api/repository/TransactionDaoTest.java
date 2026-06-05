@@ -42,11 +42,11 @@ public class TransactionDaoTest {
         double amount = 0.0;
         transactionDao.createTransaction(id, type, amount, null);
 
-        List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
+        Set<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
         assertFalse(recoveredTransactions.isEmpty());
         assertEquals(1, recoveredTransactions.size());
-        assertEquals(id, recoveredTransactions.getFirst());
+        assertTrue(recoveredTransactions.contains(id));
     }
 
     @Test
@@ -56,15 +56,28 @@ public class TransactionDaoTest {
         transactionDao.createTransaction(1L, type, 1.0, null);
         transactionDao.createTransaction(2L, type, 2.0, null);
 
-        List<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
+        Set<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
 
         assertEquals(2, recoveredTransactions.size());
         assertTrue(recoveredTransactions.containsAll(List.of(1L, 2L)));
     }
 
     @Test
+    void test_GetTransactionByType_SameIdTwice_NoDuplicates(){
+        //Prepare: re-PUT of the same id must not duplicate it in the type index
+        String type = "cars";
+        transactionDao.createTransaction(1L, type, 1.0, null);
+        transactionDao.createTransaction(1L, type, 1.0, null);
+
+        Set<Long> recoveredTransactions = transactionDao.getTransactionsByType(type);
+
+        assertEquals(1, recoveredTransactions.size());
+        assertTrue(recoveredTransactions.contains(1L));
+    }
+
+    @Test
     void test_GetTransactionByType_UnknownType_ReturnsEmpty(){
-        List<Long> recoveredTransactions = transactionDao.getTransactionsByType("does-not-exist");
+        Set<Long> recoveredTransactions = transactionDao.getTransactionsByType("does-not-exist");
 
         assertNotNull(recoveredTransactions);
         assertTrue(recoveredTransactions.isEmpty());

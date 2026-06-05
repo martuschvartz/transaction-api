@@ -8,7 +8,7 @@ import java.util.Set;
 public interface TransactionService {
     Transaction createTransaction(long id, String type, double amount, Long parentId);
 
-    List<Long> getTransactionsByType(String type);
+    Set<Long> getTransactionsByType(String type);
 
     double getAmountSum(long id);
 

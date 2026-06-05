@@ -28,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Long> getTransactionsByType(String type) {
+    public Set<Long> getTransactionsByType(String type) {
         return transactionDao.getTransactionsByType(type);
     }
 

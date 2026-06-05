@@ -41,10 +41,10 @@ public class TransactionController {
     }
 
     @GetMapping("/types/{type}")
-    public ResponseEntity<List<Long>> getTransactionsByType(
+    public ResponseEntity<Set<Long>> getTransactionsByType(
             @PathVariable String type
     ){
-        List<Long> ids = transactionService.getTransactionsByType(type);
+        Set<Long> ids = transactionService.getTransactionsByType(type);
         return ResponseEntity.ok(ids);
     }
 

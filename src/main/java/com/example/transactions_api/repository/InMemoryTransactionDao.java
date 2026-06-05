@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryTransactionDao implements TransactionDao {
 
     private final Map<Long, Transaction> store;
-    private final Map<String, List<Long>> transactionByType;
+    private final Map<String, Set<Long>> transactionByType;
 
     public InMemoryTransactionDao(){
         this.store = new ConcurrentHashMap<>();
@@ -22,15 +22,15 @@ public class InMemoryTransactionDao implements TransactionDao {
     public Transaction createTransaction(long id, String type, double amount, Long parentId) {
         Transaction newTransaction = new Transaction(type, amount, parentId);
         store.put(id, newTransaction);
-        transactionByType.computeIfAbsent(type, newType -> new ArrayList<>()).add(id);
+        transactionByType.computeIfAbsent(type, newType -> ConcurrentHashMap.newKeySet()).add(id);
         return newTransaction;
     }
 
     @Override
-    public List<Long> getTransactionsByType(String type) {
+    public Set<Long> getTransactionsByType(String type) {
         if(type == null || type.isBlank())
-            return List.of();
-        return List.copyOf(transactionByType.getOrDefault(type, List.of()));
+            return Set.of();
+        return Set.copyOf(transactionByType.getOrDefault(type, Set.of()));
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.Map;
 public interface TransactionDao {
     Transaction createTransaction(long id, String type, double amount, Long parentId);
 
-    List<Long> getTransactionsByType(String type);
+    Set<Long> getTransactionsByType(String type);
 
     Map<Long, Transaction> getAll();
 
