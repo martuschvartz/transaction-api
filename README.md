@@ -120,6 +120,30 @@ curl -i -X PUT http://localhost:8080/transactions/10 \
   -d '{"amount":5000,"type":"cars"}'
 ```
 
+### `GET /transactions/types` - List existing types
+
+> **Extra endpoint** (not part of the original spec). It is a convenience helper for
+> `GET /transactions/types/{type}`: it lets the user discover which type values currently
+> exist so they know what to query.
+>
+> Note: there is intentionally no equivalent "list all" helper for the sum endpoint. A
+> plain unfiltered `GET` would return every transaction, which would eventually call for
+> pagination (out of scope).
+
+Returns the set of all existing transaction types.
+
+**Response:** `200 OK` (empty array `[]` if there are none)
+
+```json
+["cars", "shopping"]
+```
+
+**Example:**
+
+```bash
+curl -i http://localhost:8080/transactions/types
+```
+
 ### `GET /transactions/types/{type}` - List ids by type
 
 Returns the ids of all transactions of a given type.

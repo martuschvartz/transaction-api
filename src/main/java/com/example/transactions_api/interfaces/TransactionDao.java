@@ -3,6 +3,7 @@ package com.example.transactions_api.interfaces;
 import com.example.transactions_api.models.Transaction;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 public interface TransactionDao {
@@ -11,4 +12,6 @@ public interface TransactionDao {
     List<Long> getTransactionsByType(String type);
 
     Map<Long, Transaction> getAll();
+
+    Set<String> getExistingTypes();
 }

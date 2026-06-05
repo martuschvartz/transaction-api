@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,5 +95,26 @@ public class TransactionDaoTest {
         assertEquals(type, all.get(id2).type());
         assertEquals(amount2, all.get(id2).amount(), EPSILON);
         assertEquals(id1, all.get(id2).parentId());
+    }
+
+    @Test
+    void test_GetExistingTypes_ReturnsDistinctTypes(){
+        //Prepare
+        transactionDao.createTransaction(1L, "cars", 1.0, null);
+        transactionDao.createTransaction(2L, "cars", 2.0, null);
+        transactionDao.createTransaction(3L, "bikes", 3.0, null);
+
+        Set<String> types = transactionDao.getExistingTypes();
+
+        assertEquals(2, types.size());
+        assertEquals(Set.of("cars", "bikes"), types);
+    }
+
+    @Test
+    void test_GetExistingTypes_EmptyWhenNoTransactions(){
+        Set<String> types = transactionDao.getExistingTypes();
+
+        assertNotNull(types);
+        assertTrue(types.isEmpty());
     }
 }

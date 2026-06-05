@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/transactions")
@@ -33,8 +34,14 @@ public class TransactionController {
         return ResponseEntity.ok(new StatusResponse("ok"));
     }
 
+    @GetMapping("/types")
+    public ResponseEntity<Set<String>> getExistingTypes(){
+        Set<String> types = transactionService.getExistingTypes();
+        return ResponseEntity.ok(types);
+    }
+
     @GetMapping("/types/{type}")
-    public ResponseEntity<List<Long>> createTransaction(
+    public ResponseEntity<List<Long>> getTransactionsByType(
             @PathVariable String type
     ){
         List<Long> ids = transactionService.getTransactionsByType(type);

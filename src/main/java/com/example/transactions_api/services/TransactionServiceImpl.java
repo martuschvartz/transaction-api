@@ -60,4 +60,9 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return sum;
     }
+
+    @Override
+    public Set<String> getExistingTypes() {
+        return transactionDao.getExistingTypes();
+    }
 }

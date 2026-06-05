@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -43,6 +44,25 @@ class TransactionControllerIntegrationTest {
     @Test
     void test_GetByType_UnknownType_ReturnsEmptyList() throws Exception {
         mockMvc.perform(get("/transactions/types/does-not-exist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void test_GetExistingTypes_ContainsCreatedType() throws Exception {
+        mockMvc.perform(put("/transactions/40")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":5000,\"type\":\"electronics\"}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/transactions/types"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasItem("electronics")));
+    }
+
+    @Test
+    void test_GetExistingTypes_ReturnsEmpty() throws Exception {
+        mockMvc.perform(get("/transactions/types"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }

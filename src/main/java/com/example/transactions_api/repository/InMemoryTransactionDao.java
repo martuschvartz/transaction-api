@@ -37,4 +37,9 @@ public class InMemoryTransactionDao implements TransactionDao {
     public Map<Long, Transaction> getAll() {
         return Map.copyOf(store);
     }
+
+    @Override
+    public Set<String> getExistingTypes() {
+        return Set.copyOf(transactionByType.keySet());
+    }
 }
