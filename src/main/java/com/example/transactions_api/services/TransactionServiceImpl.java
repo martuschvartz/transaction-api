@@ -19,7 +19,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     public TransactionServiceImpl(final TransactionDao transactionDao){
-        this.transactionDao=transactionDao;
+        this.transactionDao = transactionDao;
     }
 
     @Override
@@ -29,8 +29,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Long> getTransactionsByType(String type) {
-        if(type == null || type.isBlank())
-            return List.of();
         return transactionDao.getTransactionsByType(type);
     }
 

@@ -22,11 +22,11 @@ public class TransactionDaoTest {
 
     @Test
     void test_CreateTransaction_Successfully(){
-        long validId = 1L;
-        String type = "transaction type";
+        long id = 1L;
+        String type = "transaction-type";
         double amount = 10.0;
 
-        Transaction newTransaction = transactionDao.createTransaction(validId, type, amount, null);
+        Transaction newTransaction = transactionDao.createTransaction(id, type, amount, null);
 
         assertNotNull(newTransaction);
         assertEquals(type, newTransaction.type());
@@ -72,13 +72,27 @@ public class TransactionDaoTest {
     @Test
     void test_GetAll_ReturnsEveryStoredTransaction(){
         //Prepare
-        transactionDao.createTransaction(1L, "type", 1.0, null);
-        transactionDao.createTransaction(2L, "type", 2.0, 1L);
+        long id1 = 1L;
+        long id2 = 2L;
+        String type = "type";
+        double amount1 = 1.0;
+        double amount2 = 2.0;
+
+        transactionDao.createTransaction(id1, type, amount1, null);
+        transactionDao.createTransaction(id2, type, amount2, id1);
 
         Map<Long, Transaction> all = transactionDao.getAll();
 
         assertEquals(2, all.size());
-        assertEquals(1.0, all.get(1L).amount(), EPSILON);
-        assertEquals(1L, all.get(2L).parentId());
+
+        assertTrue(all.containsKey(id1));
+        assertEquals(type, all.get(id1).type());
+        assertEquals(amount1, all.get(id1).amount(), EPSILON);
+        assertNull(all.get(id1).parentId());
+
+        assertTrue(all.containsKey(id2));
+        assertEquals(type, all.get(id2).type());
+        assertEquals(amount2, all.get(id2).amount(), EPSILON);
+        assertEquals(id1, all.get(id2).parentId());
     }
 }
